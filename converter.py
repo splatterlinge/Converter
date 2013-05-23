@@ -1,22 +1,57 @@
 #!/usr/bin/env python
 
-import getopt, sys
+import sys, os, shutil
+import argparse
+import ConfigParser
 
 def usage():
 	print "help"
 
-def createIni(name, ambient, diffuse, specular, emission, shininess, maps, shader):
-	print name
-	print ambient
-	print diffuse
-	print specular
-	print emission
-	print shininess
-	print maps
-	print shader
+def create(dstdir, name, ambient, diffuse, specular, emission, shininess, maps, shader):
+	config = ConfigParser.RawConfigParser()
 
-def parseMtl(filename):
-	file = open(filename, 'r')
+	config.add_section('Model')
+	config.set('Model', 'ambientRed', ambient['red'])
+	config.set('Model', 'ambientGreen', ambient['green'])
+	config.set('Model', 'ambientBlue', ambient['blue'])
+	config.set('Model', 'ambientAlpha', ambient['alpha'])
+
+	config.set('Model', 'diffuseRed', diffuse['red'])
+	config.set('Model', 'diffuseGreen', diffuse['green'])
+	config.set('Model', 'diffuseBlue', diffuse['blue'])
+	config.set('Model', 'diffuseAlpha', diffuse['alpha'])
+
+	config.set('Model', 'specularRed', specular['red'])
+	config.set('Model', 'specularGreen', specular['green'])
+	config.set('Model', 'specularBlue', specular['blue'])
+	config.set('Model', 'specularAlpha', specular['alpha'])
+
+	config.set('Model', 'emissionRed', emission['red'])
+	config.set('Model', 'emissionGreen', emission['green'])
+	config.set('Model', 'emissionBlue', emission['blue'])
+	config.set('Model', 'emissionAlpha', emission['alpha'])
+
+	config.set('Model', 'shininess', shininess)
+
+	config.add_section('Textures')
+	config.set('Textures', 'diffuseMap', maps['diffuse'])
+
+	config.add_section('Shader')
+	config.set('Shader', 'defaultShader', shader['default'])
+	config.set('Shader', 'blobbingShader', shader['blobbing'])
+
+	try:
+		os.makedirs('generate/'+name)
+	except:
+		pass
+
+	with open('generate/'+name+'/material.ini', 'wb') as configfile:
+		config.write(configfile)
+
+	shutil.move('generate/'+name, dstdir)
+
+def parseMtl(srcdir, srcfile, dstdir):
+	file = open(os.path.join(srcdir, srcfile), 'r')
 
 	name = None
 	ambient = {'red':0, 'green':0, 'blue':0, 'alpha':1}
@@ -25,7 +60,7 @@ def parseMtl(filename):
 	emission = {'red':0, 'green':0, 'blue':0, 'alpha':1}
 	shininess = 80
 	maps = {}
-	shader = {'default':'versatile'}
+	shader = {'default':'versatile', 'blobbing':'versatileBlob'}
 
 	for line in file.readlines():
 		line = line.rstrip()
@@ -37,9 +72,9 @@ def parseMtl(filename):
 		
 		if keyword == "newmtl":
 			if name:
-				createIni(name, ambient, diffuse, specular, emission, shininess, maps, shader)
+				create(dstdir, name, ambient, diffuse, specular, emission, shininess, maps, shader)
 				
-			name = fields[0]
+			name = os.path.splitext(srcfile)[0]+'_'+fields[0]
 		elif keyword == "Ka":
 			ambient['red'] = fields[0]
 			ambient['green'] = fields[1]
@@ -59,28 +94,19 @@ def parseMtl(filename):
 		elif keyword == "map_Ks":
 			maps['diffuse'] = fields[0]
 
-	createIni(name, ambient, diffuse, specular, emission, shininess, maps, shader)
+	create(dstdir, name, ambient, diffuse, specular, emission, shininess, maps, shader)
 		
 
 def main():
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hm:", ["help", "material="])
-    except getopt.GetoptError as err:
-        # print help information and exit:
-        print str(err) # will print something like "option -a not recognized"
-        usage()
-        sys.exit(2)
-    output = None
-    verbose = False
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--material', required=True, help='Material filepath.')
+	parser.add_argument('--outdir', required=True, help='Output directory.')
+	args = parser.parse_args()
 
-    for o, a in opts:
-    	if o in ("-h", "--help"):
-            usage()
-            sys.exit()
-        elif o in ("-m", "--material"):
-            parseMtl(a)
-        else:
-            assert False, "unhandled option"
+	srcdir = os.path.dirname(args.material)
+	srcfile = os.path.basename(args.material)
+	dstdir = "."
+	parseMtl(srcdir, srcfile, args.outdir)
 
 if __name__ == "__main__":
-    main()
+	main()
