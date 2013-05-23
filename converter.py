@@ -13,7 +13,8 @@ def create(srcdir, dstdir, name, ambient, diffuse, specular, emission, shininess
 	except:
 		pass
 
-	config = ConfigParser.RawConfigParser()
+	config = ConfigParser.ConfigParser()
+	config.optionxform=str
 
 	config.add_section('Model')
 	config.set('Model', 'ambientRed', ambient['red'])
