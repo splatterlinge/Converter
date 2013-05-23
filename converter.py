@@ -8,6 +8,14 @@ def usage():
 	print "help"
 
 def create(srcdir, dstdir, name, ambient, diffuse, specular, emission, shininess, maps, shader):
+	print ambient
+	print diffuse
+	print specular
+	print emission
+	print shininess
+	print maps
+	print shader
+
 	try:
 		os.makedirs(os.path.join(dstdir, name))
 	except:
@@ -63,7 +71,7 @@ def parseMtl(srcdir, srcfile, dstdir):
 	shader = {'default':'versatile', 'blobbing':'versatileBlob'}
 
 	for line in file.readlines():
-		line = line.rstrip()
+		line = line.strip()
 		fields = line.split(" ")
 		keyword = fields.pop(0)
 
