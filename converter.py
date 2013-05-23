@@ -7,7 +7,12 @@ import ConfigParser
 def usage():
 	print "help"
 
-def create(dstdir, name, ambient, diffuse, specular, emission, shininess, maps, shader):
+def create(srcdir, dstdir, name, ambient, diffuse, specular, emission, shininess, maps, shader):
+	try:
+		os.makedirs(os.path.join(dstdir, name))
+	except:
+		pass
+
 	config = ConfigParser.RawConfigParser()
 
 	config.add_section('Model')
@@ -35,20 +40,14 @@ def create(dstdir, name, ambient, diffuse, specular, emission, shininess, maps, 
 
 	config.add_section('Textures')
 	config.set('Textures', 'diffuseMap', maps['diffuse'])
+	shutil.copyfile(os.path.join(srcdir, maps['diffuse']), os.path.join(dstdir, name, maps['diffuse']))
 
 	config.add_section('Shader')
 	config.set('Shader', 'defaultShader', shader['default'])
 	config.set('Shader', 'blobbingShader', shader['blobbing'])
 
-	try:
-		os.makedirs('generate/'+name)
-	except:
-		pass
-
-	with open('generate/'+name+'/material.ini', 'wb') as configfile:
-		config.write(configfile)
-
-	shutil.move('generate/'+name, dstdir)
+	with open(os.path.join(dstdir, name, 'material.ini'), 'wb') as configfile:
+		config.write(configfile)	
 
 def parseMtl(srcdir, srcfile, dstdir):
 	file = open(os.path.join(srcdir, srcfile), 'r')
@@ -72,7 +71,7 @@ def parseMtl(srcdir, srcfile, dstdir):
 		
 		if keyword == "newmtl":
 			if name:
-				create(dstdir, name, ambient, diffuse, specular, emission, shininess, maps, shader)
+				create(srcdir, dstdir, name, ambient, diffuse, specular, emission, shininess, maps, shader)
 				
 			name = os.path.splitext(srcfile)[0]+'_'+fields[0]
 		elif keyword == "Ka":
@@ -94,7 +93,7 @@ def parseMtl(srcdir, srcfile, dstdir):
 		elif keyword == "map_Ks":
 			maps['diffuse'] = fields[0]
 
-	create(dstdir, name, ambient, diffuse, specular, emission, shininess, maps, shader)
+	create(srcdir, dstdir, name, ambient, diffuse, specular, emission, shininess, maps, shader)
 		
 
 def main():
@@ -105,7 +104,7 @@ def main():
 
 	srcdir = os.path.dirname(args.material)
 	srcfile = os.path.basename(args.material)
-	dstdir = "."
+	
 	parseMtl(srcdir, srcfile, args.outdir)
 
 if __name__ == "__main__":
