@@ -3,6 +3,7 @@
 import sys, os, shutil
 import argparse
 import ConfigParser
+from PIL import Image
 
 def usage():
 	print "help"
@@ -47,6 +48,13 @@ def create(srcdir, dstdir, name, ambient, diffuse, specular, emission, shininess
 
 	config.set('Model', 'shininess', shininess)
 
+	img = Image.open(os.path.join(srcdir, maps['diffuse']), 'r')
+	if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
+		config.add_section('AlphaTest')
+		config.set('AlphaTest', 'enable', 'true')
+		config.set('AlphaTest', 'function', 'GL_GREATER')
+		config.set('AlphaTest', 'referenceValue', '0.5')
+
 	config.add_section('Textures')
 	config.set('Textures', 'diffuseMap', maps['diffuse'])
 	shutil.copyfile(os.path.join(srcdir, maps['diffuse']), os.path.join(dstdir, name, maps['diffuse']))
@@ -68,7 +76,7 @@ def parseMtl(srcdir, srcfile, dstdir):
 	emission = {'red':0, 'green':0, 'blue':0, 'alpha':1}
 	shininess = 80
 	maps = {}
-	shader = {'default':'versatile', 'blobbing':'versatileBlob'}
+	shader = {'default':'simple', 'blobbing':'simpleBlob'}
 
 	for line in file.readlines():
 		line = line.strip()
