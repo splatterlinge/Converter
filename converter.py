@@ -56,12 +56,23 @@ def create(srcdir, dstdir, name, ambient, diffuse, specular, emission, shininess
 		config.set('AlphaTest', 'referenceValue', '0.5')
 
 	config.add_section('Textures')
+	config.set('Textures', 'ambientMap', maps['ambient'])
+	shutil.copyfile(os.path.join(srcdir, maps['ambient']), os.path.join(dstdir, name, maps['ambient']))
 	config.set('Textures', 'diffuseMap', maps['diffuse'])
 	shutil.copyfile(os.path.join(srcdir, maps['diffuse']), os.path.join(dstdir, name, maps['diffuse']))
+	config.set('Textures', 'normalMap', maps['normal'])
+	shutil.copyfile(os.path.join(srcdir, maps['normal']), os.path.join(dstdir, name, maps['normal']))
+	config.set('Textures', 'specularMap', maps['specular'])
+	shutil.copyfile(os.path.join(srcdir, maps['specular']), os.path.join(dstdir, name, maps['specular']))
+	config.set('Textures', 'alphaMap', maps['alpha'])
+	shutil.copyfile(os.path.join(srcdir, maps['alpha']), os.path.join(dstdir, name, maps['alpha']))
+	config.set('Textures', 'bumpMap', maps['bump'])
+	shutil.copyfile(os.path.join(srcdir, maps['bump']), os.path.join(dstdir, name, maps['bump']))
 
 	config.add_section('Shader')
-	config.set('Shader', 'defaultShader', shader['default'])
-	config.set('Shader', 'blobbingShader', shader['blobbing'])
+	config.set('Shader', 'high', shader['high'])
+	config.set('Shader', 'medium', shader['medium'])
+	config.set('Shader', 'low', shader['low'])
 
 	with open(os.path.join(dstdir, name, 'material.ini'), 'wb') as configfile:
 		config.write(configfile)	
@@ -76,7 +87,7 @@ def parseMtl(srcdir, srcfile, dstdir):
 	emission = {'red':0, 'green':0, 'blue':0, 'alpha':1}
 	shininess = 80
 	maps = {}
-	shader = {'default':'simple', 'blobbing':'simpleBlob'}
+	shader = {'high':'diff', 'medium':'diff', 'low':'diff'}
 
 	for line in file.readlines():
 		line = line.strip()
@@ -104,11 +115,15 @@ def parseMtl(srcdir, srcfile, dstdir):
 			specular['green'] = fields[1]
 			specular['blue'] = fields[1]
 		elif keyword == "map_Ka":
-			maps['diffuse'] = fields[0]
+			maps['ambient'] = fields[0]
 		elif keyword == "map_Kd":
 			maps['diffuse'] = fields[0]
 		elif keyword == "map_Ks":
-			maps['diffuse'] = fields[0]
+			maps['specular'] = fields[0]
+		elif keyword == "map_d":
+			maps['alpha'] = fields[0]
+		elif keyword == "map_bump":
+			maps['bump'] = fields[0]
 
 	create(srcdir, dstdir, name, ambient, diffuse, specular, emission, shininess, maps, shader)
 		
