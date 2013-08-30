@@ -105,15 +105,15 @@ def parseMtl(srcdir, srcfile, dstdir):
 		elif keyword == "Ka":
 			ambient['red'] = fields[0]
 			ambient['green'] = fields[1]
-			ambient['blue'] = fields[1]
+			ambient['blue'] = fields[2]
 		elif keyword == "Kd":
 			diffuse['red'] = fields[0]
 			diffuse['green'] = fields[1]
-			diffuse['blue'] = fields[1]
+			diffuse['blue'] = fields[2]
 		elif keyword == "Ks":
 			specular['red'] = fields[0]
 			specular['green'] = fields[1]
-			specular['blue'] = fields[1]
+			specular['blue'] = fields[2]
 		elif keyword == "map_Ka":
 			maps['ambient'] = fields[0]
 		elif keyword == "map_Kd":
