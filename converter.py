@@ -56,18 +56,24 @@ def create(srcdir, dstdir, name, ambient, diffuse, specular, emission, shininess
 		config.set('AlphaTest', 'referenceValue', '0.5')
 
 	config.add_section('Textures')
-	config.set('Textures', 'ambientMap', maps['ambient'])
-	shutil.copyfile(os.path.join(srcdir, maps['ambient']), os.path.join(dstdir, name, maps['ambient']))
-	config.set('Textures', 'diffuseMap', maps['diffuse'])
-	shutil.copyfile(os.path.join(srcdir, maps['diffuse']), os.path.join(dstdir, name, maps['diffuse']))
-	config.set('Textures', 'normalMap', maps['normal'])
-	shutil.copyfile(os.path.join(srcdir, maps['normal']), os.path.join(dstdir, name, maps['normal']))
-	config.set('Textures', 'specularMap', maps['specular'])
-	shutil.copyfile(os.path.join(srcdir, maps['specular']), os.path.join(dstdir, name, maps['specular']))
-	config.set('Textures', 'alphaMap', maps['alpha'])
-	shutil.copyfile(os.path.join(srcdir, maps['alpha']), os.path.join(dstdir, name, maps['alpha']))
-	config.set('Textures', 'bumpMap', maps['bump'])
-	shutil.copyfile(os.path.join(srcdir, maps['bump']), os.path.join(dstdir, name, maps['bump']))
+	if 'ambient' in maps:
+		config.set('Textures', 'ambientMap', maps['ambient'])
+		shutil.copyfile(os.path.join(srcdir, maps['ambient']), os.path.join(dstdir, name, maps['ambient']))
+	if 'diffuse' in maps:
+		config.set('Textures', 'diffuseMap', maps['diffuse'])
+		shutil.copyfile(os.path.join(srcdir, maps['diffuse']), os.path.join(dstdir, name, maps['diffuse']))
+	if 'normal' in maps:
+		config.set('Textures', 'normalMap', maps['normal'])
+		shutil.copyfile(os.path.join(srcdir, maps['normal']), os.path.join(dstdir, name, maps['normal']))
+	if 'specular' in maps:
+		config.set('Textures', 'specularMap', maps['specular'])
+		shutil.copyfile(os.path.join(srcdir, maps['specular']), os.path.join(dstdir, name, maps['specular']))
+	if 'alpha' in maps:
+		config.set('Textures', 'alphaMap', maps['alpha'])
+		shutil.copyfile(os.path.join(srcdir, maps['alpha']), os.path.join(dstdir, name, maps['alpha']))
+	if 'bump' in maps:
+		config.set('Textures', 'bumpMap', maps['bump'])
+		shutil.copyfile(os.path.join(srcdir, maps['bump']), os.path.join(dstdir, name, maps['bump']))
 
 	config.add_section('Shader')
 	config.set('Shader', 'high', shader['high'])
