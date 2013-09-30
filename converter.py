@@ -48,12 +48,13 @@ def create(srcdir, dstdir, name, ambient, diffuse, specular, emission, shininess
 
 	config.set('Model', 'shininess', shininess)
 
-	img = Image.open(os.path.join(srcdir, maps['diffuse']), 'r')
-	if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
-		config.add_section('AlphaTest')
-		config.set('AlphaTest', 'enable', 'true')
-		config.set('AlphaTest', 'function', 'GL_GREATER')
-		config.set('AlphaTest', 'referenceValue', '0.5')
+	if 'diffuse' in maps:
+		img = Image.open(os.path.join(srcdir, maps['diffuse']), 'r')
+		if img.mode in ('RGBA', 'LA') or (img.mode == 'P' and 'transparency' in img.info):
+			config.add_section('AlphaTest')
+			config.set('AlphaTest', 'enable', 'true')
+			config.set('AlphaTest', 'function', 'GL_GREATER')
+			config.set('AlphaTest', 'referenceValue', '0.5')
 
 	config.add_section('Textures')
 	if 'ambient' in maps:
